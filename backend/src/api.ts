@@ -20,7 +20,7 @@ interface IPost {
   _id?: ObjectId
   title: string
   content: string
-  imageUrl?: string
+  titleImageURL?: string
   author: string
   timestamp: Date
 }
@@ -115,7 +115,7 @@ app.post(
       const newPost: IPost = {
         title: req.body.title,
         content: req.body.content,
-        imageUrl: req.body.imageUrl,
+        titleImageURL: req.body.titleImageURL,
         author: req.body.author,
         timestamp: new Date(),
       }

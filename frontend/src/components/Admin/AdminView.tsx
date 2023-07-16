@@ -19,7 +19,7 @@ const AdminView = () => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [title, setTitle] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
+  const [titleImageURL, settitleImageURL] = useState("")
   const [content, setContent] = useState("")
   const [author, setAuthor] = useState("")
 
@@ -28,7 +28,7 @@ const AdminView = () => {
   const handleCloseModal = () => {
     setIsOpen(false)
     setTitle("")
-    setImageUrl("")
+    settitleImageURL("")
     setContent("")
     setAuthor("")
   }
@@ -36,7 +36,7 @@ const AdminView = () => {
   const handleAddPost = () => {
     const newPost = {
       title,
-      imageUrl,
+      titleImageURL,
       content,
       author,
     }
@@ -73,8 +73,8 @@ const AdminView = () => {
         setTitle={setTitle}
         content={content}
         setContent={setContent}
-        imageUrl={imageUrl}
-        setImageUrl={setImageUrl}
+        titleImageURL={titleImageURL}
+        settitleImageURL={settitleImageURL}
         author={author}
         setAuthor={setAuthor}
         handleAddPost={handleAddPost}

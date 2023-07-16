@@ -11,8 +11,8 @@ interface PostModalProps {
   setTitle: (value: string) => void
   content: string
   setContent: (value: string) => void
-  imageUrl: string
-  setImageUrl: (value: string) => void
+  titleImageURL: string
+  settitleImageURL: (value: string) => void
   handleAddPost: () => void
   author: string
   setAuthor: (value: string) => void
@@ -25,8 +25,8 @@ const PostModal: React.FC<PostModalProps> = ({
   setTitle,
   content,
   setContent,
-  imageUrl,
-  setImageUrl,
+  titleImageURL,
+  settitleImageURL,
   handleAddPost,
   author,
   setAuthor,
@@ -105,8 +105,8 @@ const PostModal: React.FC<PostModalProps> = ({
         </div>
 
         <input
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
+          value={titleImageURL}
+          onChange={(e) => settitleImageURL(e.target.value)}
           placeholder="Image URL"
           className="bg-black text-white border-2 p-2 rounded mb-4 w-full"
         />

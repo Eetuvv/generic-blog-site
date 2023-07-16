@@ -75,13 +75,18 @@ const BlogPost = () => {
       } else if (block.startsWith("image:")) {
         const [url, alt] = block.slice(6).split("|")
         return (
-          <div key={index}>
-            <img
-              src={url}
-              alt={alt}
-              onError={handleImageError}
-              className="w-full h-auto object-cover"
-            />
+          <div
+            className="flex justify-center items-center w-full h-full"
+            key={index}
+          >
+            <div className="w-7/12 h-7/12">
+              <img
+                src={url}
+                alt={alt}
+                onError={handleImageError}
+                className="block mx-auto max-w-full h-auto"
+              />
+            </div>
           </div>
         )
       }
@@ -97,24 +102,24 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="bg-black text-white py-16 px-8">
-      <div className="max-w-3xl mx-auto space-y-8">
-        <h1 className="text-4xl font-bold">{post.title}</h1>
-        <div className="text-sm text-gray-400 flex items-center">
-          <span>{post.author}</span>
-          <span className="mx-2">|</span>
-          <span>{formattedDate}</span>
-        </div>
-        {post.imageUrl !== null && (
-          <div>
+    <div className="bg-black text-white py-6 px-8">
+      <div className="max-w-3xl mx-auto space-y-4">
+        {post.titleImageURL !== null && (
+          <div className="">
             <img
-              src={post.imageUrl}
+              src={post.titleImageURL}
               alt={post.title}
-              className="w-6/12 h-6/12 rounded-md object-cover"
+              className="max-w-full max-h-full mb-10"
               onError={handleImageError}
             />
           </div>
         )}
+        <h1 className="text-4xl font-bold">{post.title}</h1>
+        <div className="text-lg text-gray-400 flex items-center mb-10">
+          <span>{post.author}</span>
+          <span className="mx-2">|</span>
+          <span>{formattedDate}</span>
+        </div>
         <div>{parseContent(post.content)}</div>
       </div>
     </div>

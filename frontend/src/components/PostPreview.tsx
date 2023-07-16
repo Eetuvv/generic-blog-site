@@ -85,13 +85,13 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
                   {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
                 </p>
               </div>
-              {storedPost.imageUrl && (
+              {storedPost.titleImageURL && (
                 <div
                   className="ml-4 md:ml-0 mt-2"
                   style={{ width: "150px", height: "125px" }}
                 >
                   <img
-                    src={storedPost.imageUrl}
+                    src={storedPost.titleImageURL}
                     alt={storedPost.title}
                     className="w-full h-full rounded-md object-cover"
                     onError={handleImageError}

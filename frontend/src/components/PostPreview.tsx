@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { RootState } from "../store"
 import { IPost } from "../postSlice"
-import { formatDate } from "../dateutils"
+import { formatDate } from "../utils/dateutils"
 
 interface PostContainerProps {
   posts: IPost[]

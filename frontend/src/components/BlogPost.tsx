@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { RootState, AppDispatch } from "../store"
 import { fetchSinglePost } from "../postSlice"
 import LoadingSpinner from "../components/LoadingSpinner"
-import { formatDate } from "../dateutils"
+import { formatDate } from "../utils/dateutils"
 
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>()

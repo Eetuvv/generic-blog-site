@@ -39,6 +39,21 @@ const PostModal: React.FC<PostModalProps> = ({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
+  const insertImage = () => {
+    const url = prompt("Enter the image URL:")
+    if (url) {
+      const alt = prompt("Enter the alt text:")
+      setContent(content + `{image:${url}|${alt}}`)
+    }
+  }
+
+  const insertTweet = () => {
+    const tweetId = prompt("Enter the tweet ID:")
+    if (tweetId) {
+      setContent(content + `{tweet:${tweetId}}`)
+    }
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -61,6 +76,19 @@ const PostModal: React.FC<PostModalProps> = ({
           placeholder="Title"
           className="bg-black text-white border-2 p-2 rounded mb-4 w-full"
         />
+        <button
+          onClick={insertImage}
+          className="bg-white text-black hover:bg-gray-200 font-semibold py-1 px-2 rounded mr-2 mb-3 mt-4"
+        >
+          Insert Image
+        </button>
+
+        <button
+          onClick={insertTweet}
+          className="bg-white text-black hover:bg-gray-200 font-semibold py-1 px-2 rounded mr-2 my-2 mt-4"
+        >
+          Insert Tweet
+        </button>
         <ReactQuill
           value={content}
           onChange={setContent}

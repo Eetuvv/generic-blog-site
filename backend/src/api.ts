@@ -6,6 +6,7 @@ import bodyParser from "body-parser"
 import cors from "cors"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import cookieParser from "cookie-parser"
 
 dotenvConfig()
 
@@ -43,16 +44,21 @@ client
   })
 
 const app = express()
-app.use(cors())
+app.use(
+  cors({
+    origin: "http://localhost:3000", // your react app url
+    credentials: true,
+  })
+)
 app.use(bodyParser.json())
+app.use(cookieParser())
 
 const authenticateToken = (
   req: AuthenticatedRequest,
   res: Response,
   next: () => void
 ) => {
-  const authHeader = req.headers.authorization
-  const token = authHeader && authHeader.split(" ")[1]
+  const token = req.cookies.token
 
   if (token == null) {
     return res.sendStatus(401)
@@ -68,54 +74,38 @@ const authenticateToken = (
   })
 }
 
-app.post("/api/login", async (req: Request, res: Response) => {
-  try {
-    const { username, password } = req.body
+app.post(
+  "http://localhost:5000/api/login",
+  async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body
 
-    const user = await usersCollection.findOne({ username })
+      const user = await usersCollection.findOne({ username })
 
-    if (!user) {
-      return res.status(404).send({ message: "Invalid credentials" })
+      if (!user) {
+        return res.status(404).send({ message: "Invalid credentials" })
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password)
+
+      if (!passwordMatch) {
+        return res.status(401).send({ message: "Invalid credentials" })
+      }
+
+      const token = jwt.sign(
+        { username: user.username },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "1h" }
+      )
+
+      res.cookie("token", token, { httpOnly: true })
+      res.sendStatus(200)
+    } catch (err) {
+      console.error(err)
+      res.status(500).send({ message: "Internal server error" })
     }
-
-    const passwordMatch = await bcrypt.compare(password, user.password)
-
-    if (!passwordMatch) {
-      return res.status(401).send({ message: "Invalid credentials" })
-    }
-
-    const token = jwt.sign(
-      { username: user.username },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    )
-
-    res.send({ token })
-  } catch (err) {
-    console.error(err)
-    res.status(500).send({ message: "Internal server error" })
   }
-})
-
-app.get("/api/posts/:postId?", async (req: Request, res: Response) => {
-  try {
-    const postId = req.params.postId
-
-    let posts
-
-    if (postId) {
-      const post = await postsCollection.findOne({ _id: new ObjectId(postId) })
-      posts = post ? [post] : []
-    } else {
-      posts = await postsCollection.find({}).toArray()
-    }
-
-    res.send(posts)
-  } catch (err) {
-    console.error(err)
-    res.status(500).send({ message: "Internal server error" })
-  }
-})
+)
 
 app.post(
   "/api/posts",
@@ -138,6 +128,31 @@ app.post(
     }
   }
 )
+
+app.get("/api/posts/:postId?", async (req: Request, res: Response) => {
+  try {
+    const postId = req.params.postId
+
+    let posts
+
+    if (postId) {
+      const post = await postsCollection.findOne({ _id: new ObjectId(postId) })
+      posts = post ? [post] : []
+    } else {
+      posts = await postsCollection.find({}).sort({ timestamp: -1 }).toArray()
+    }
+
+    res.send(posts)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: "Internal server error" })
+  }
+})
+
+app.post("/api/logout", (req: Request, res: Response) => {
+  res.clearCookie("token")
+  res.sendStatus(200)
+})
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { TwitterTweetEmbed } from "react-twitter-embed"
 import { useDispatch, useSelector } from "react-redux"
@@ -11,27 +11,16 @@ const BlogPost = () => {
 
   const dispatch = useDispatch<AppDispatch>()
   const posts = useSelector((state: RootState) => state.post.posts)
+  const status = useSelector((state: RootState) => state.post.status)
   const post = posts.find((post) => post._id === postId)
 
-  const [isLoading, setIsLoading] = useState(false)
-
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true)
-      try {
-        if (postId) {
-          await dispatch(fetchSinglePost(postId))
-        }
-      } catch (error) {
-        console.log("Error fetching post:", error)
-      }
-      setIsLoading(false)
+    if (postId) {
+      dispatch(fetchSinglePost(postId))
     }
-
-    fetchData()
   }, [dispatch, postId])
 
-  if (isLoading) {
+  if (status === "loading") {
     return <LoadingSpinner />
   }
 
@@ -53,24 +42,56 @@ const BlogPost = () => {
   }
 
   const parseContent = (content: string) => {
-    const regex = /{(tweet:[\d]+)}/g
-    let blocks = content.split(regex)
+    const regex = /{(tweet:[\d]+|image:[^|]+?\|[^}]+?)}/g
+    let matches
+    const blocks = []
+    let lastIndex = 0
+
+    while ((matches = regex.exec(content)) !== null) {
+      if (matches.index !== lastIndex) {
+        blocks.push(content.slice(lastIndex, matches.index))
+      }
+      blocks.push(matches[1])
+      lastIndex = regex.lastIndex
+    }
+
+    if (lastIndex !== content.length) {
+      blocks.push(content.slice(lastIndex))
+    }
 
     return blocks.map((block: string, index: number) => {
       if (block.startsWith("tweet:")) {
         const tweetId = block.slice(6)
         return (
-          <div className="w-full my-3" key={index}>
-            <div className="flex justify-center">
-              <TwitterTweetEmbed tweetId={tweetId} />
+          <div className="w-full my-3 flex justify-center" key={index}>
+            <div style={{ maxWidth: "550px", width: "100%" }}>
+              <TwitterTweetEmbed
+                tweetId={tweetId}
+                options={{ width: "100%", theme: "dark" }}
+              />
             </div>
           </div>
         )
+      } else if (block.startsWith("image:")) {
+        const [url, alt] = block.slice(6).split("|")
+        return (
+          <div key={index}>
+            <img
+              src={url}
+              alt={alt}
+              onError={handleImageError}
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        )
       }
+
       return (
-        <p className="text-lg leading-7 mb-8" key={index}>
-          {block}
-        </p>
+        <p
+          className="text-lg leading-7 mb-8"
+          key={index}
+          dangerouslySetInnerHTML={{ __html: block }}
+        />
       )
     })
   }

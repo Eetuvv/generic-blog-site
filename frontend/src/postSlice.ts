@@ -38,11 +38,12 @@ export const fetchPosts = createAsyncThunk("post/fetchPosts", async () => {
 
 export const addPost = createAsyncThunk(
   "post/addPost",
-  async (newPost: IPost) => {
+  async ({ newPost, token }: { newPost: IPost; token: string }) => {
     const response = await fetch("http://localhost:5000/api/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(newPost),
     })

@@ -1,6 +1,7 @@
-import React, { useState } from "react"
+import React, { useState, useContext } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import { AuthContext } from "./AuthContext"
 
 const LoginForm = () => {
   const [username, setUsername] = useState("")
@@ -9,6 +10,8 @@ const LoginForm = () => {
   const [successMsg, setSuccessMsg] = useState("")
 
   const navigate = useNavigate()
+
+  const { setAuthentication } = useContext(AuthContext)
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -25,6 +28,7 @@ const LoginForm = () => {
       setSuccessMsg("Login successful!")
       setErrorMsg("")
       setTimeout(() => {
+        setAuthentication(true, token)
         navigate("/admin")
       }, 2000)
     } catch (err: any) {

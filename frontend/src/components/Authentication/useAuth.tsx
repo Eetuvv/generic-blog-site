@@ -1,12 +1,12 @@
 import { useContext } from "react"
 import { AuthContext } from "./AuthContext"
 
-interface AuthContextProps {
-  authenticated: boolean
-  login: () => void
-  logout: () => void
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext)
 
-export const useAuth = (): AuthContextProps => {
-  return useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider")
+  }
+
+  return context
 }

@@ -2,15 +2,18 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { RootState, AppDispatch } from "../../store"
-import { addPost, setPosts, IPost, fetchPosts } from "../../postSlice"
+import { addPost, setPosts, IPost } from "../../postSlice"
 import AddPostButton from "./AddPostButton"
 import PostModal from "./PostModal"
 import LoadingSpinner from "../LoadingSpinner"
 import { useAuth } from "../Authentication/useAuth"
+import Modal from "react-modal"
+
+Modal.setAppElement("#root")
 
 const AdminView = () => {
-  const { authenticated } = useAuth() // get authentication state
-  const navigate = useNavigate() // get navigate function for redirection
+  const { authenticated, token } = useAuth()
+  const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>()
   const status = useSelector((state: RootState) => state.post.status)
 
@@ -37,18 +40,19 @@ const AdminView = () => {
       content,
       author,
     }
-    dispatch(addPost(newPost)).then((action) => {
-      const insertedPost = action.payload as IPost
-      dispatch(setPosts([insertedPost]))
-    })
+    if (token) {
+      dispatch(addPost({ newPost, token }))
+        .then((action) => {
+          const insertedPost = action.payload as IPost
+          dispatch(setPosts([insertedPost]))
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
     handleCloseModal()
   }
 
-  useEffect(() => {
-    dispatch(fetchPosts())
-  }, [dispatch])
-
-  // Redirect unauthenticated users to the login page
   useEffect(() => {
     if (!authenticated) {
       navigate("/login")

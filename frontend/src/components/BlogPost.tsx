@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { RootState, AppDispatch } from "../store"
 import { fetchSinglePost } from "../postSlice"
 import LoadingSpinner from "../components/LoadingSpinner"
+import { formatDate } from "../dateutils"
 
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>()
@@ -29,11 +30,7 @@ const BlogPost = () => {
   }
 
   const date = post.timestamp ? new Date(post.timestamp) : null
-  const formattedDate = date?.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+  const formattedDate = date ? formatDate(date) : null
 
   const handleImageError = (
     event: React.SyntheticEvent<HTMLImageElement, Event>

@@ -10,10 +10,10 @@ interface PostContainerProps {
 
 const MAX_TEXT_LENGTH = 200
 
-// cut string at the last full word within the limit and add "..."
-const getPreviewText = (text: string, maxLength: number) => {
-  // quill adds extra <p> tags
-  let strippedText = text.replace(/<p>|<\/p>/g, "")
+// Cut string at the last full word within the limit and add "..."
+const getPreviewText = (text: string | undefined, maxLength: number) => {
+  let strippedText =
+    text?.replace(/<p>|<\/p>|{tweet:[\d]+}|{image:[^}]+}/g, "") ?? ""
   if (strippedText.length <= maxLength) return strippedText
   let trimmedText = strippedText.slice(0, maxLength)
   trimmedText = trimmedText.substr(
@@ -23,29 +23,36 @@ const getPreviewText = (text: string, maxLength: number) => {
   return `${trimmedText}...`
 }
 
-const PreviewPost: React.FC<PostContainerProps> = ({ posts }) => {
+const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
   const storedPosts = useSelector((state: RootState) => state.post.posts)
+
+  const handleImageError = (
+    event: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    event.currentTarget.style.display = "none" // Hide the image if it fails to load
+  }
 
   return (
     <div className="container mx-auto px-1 py-8">
       <div className="max-w-3xl mx-auto">
-        {posts.map((post) => {
-          const storedPost = storedPosts.find((p) => p._id === post._id)
+        {posts.map((post, index) => {
+          const storedPost = storedPosts.find((p) => p?._id === post?._id)
           if (!storedPost) return null
           return (
             <Link
               to={`/posts/${storedPost._id}`}
-              key={storedPost._id.toString()}
-              className="block hover:bg-gray-800 transition-colors p-4 rounded-md"
+              key={index}
+              className="block hover:bg-gray-800 transition-colors p-4 rounded-md flex"
             >
-              <div
-                className="flex-1 flex flex-col items-center md:items-start text-center md:text-left md:mr-6"
-                style={{ flexBasis: "60%" }}
-              >
-                <h2 className="text-3xl font-bold mb-2">{storedPost.title}</h2>
-                <p className="text-lg text-gray-300 leading-snug">
-                  {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
-                </p>
+              <div className="flex-1">
+                <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                  <h2 className="text-3xl font-bold mb-2">
+                    {storedPost.title}
+                  </h2>
+                  <p className="text-lg text-gray-300 leading-snug">
+                    {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
+                  </p>
+                </div>
               </div>
               {storedPost.imageUrl && (
                 <div
@@ -56,6 +63,7 @@ const PreviewPost: React.FC<PostContainerProps> = ({ posts }) => {
                     src={storedPost.imageUrl}
                     alt={storedPost.title}
                     className="w-full h-full rounded-md object-cover"
+                    onError={handleImageError}
                   />
                 </div>
               )}
@@ -67,4 +75,4 @@ const PreviewPost: React.FC<PostContainerProps> = ({ posts }) => {
   )
 }
 
-export default PreviewPost
+export default PostPreview

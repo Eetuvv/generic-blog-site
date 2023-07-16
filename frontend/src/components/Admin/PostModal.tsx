@@ -14,6 +14,8 @@ interface PostModalProps {
   imageUrl: string
   setImageUrl: (value: string) => void
   handleAddPost: () => void
+  author: string
+  setAuthor: (value: string) => void
 }
 
 const PostModal: React.FC<PostModalProps> = ({
@@ -26,6 +28,8 @@ const PostModal: React.FC<PostModalProps> = ({
   imageUrl,
   setImageUrl,
   handleAddPost,
+  author,
+  setAuthor,
 }) => {
   const [files, setFiles] = useState<File[]>([])
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -45,6 +49,12 @@ const PostModal: React.FC<PostModalProps> = ({
     >
       <div className="bg-black text-white p-8 rounded-lg border-white border-2 w-8/12">
         <h2 className="text-2xl font-semibold mb-4">Add Post</h2>
+        <input
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          placeholder="Author"
+          className="bg-black text-white border-2 p-2 rounded mb-4 w-full"
+        />
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}

@@ -1,10 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export interface IPost {
-  _id: String
+  _id?: string
   title: string
-  imageUrl: string
   content: string
+  imageUrl?: string
+  author: string
+  timestamp?: Date
 }
 
 interface PostState {
@@ -26,10 +28,8 @@ export const fetchPosts = createAsyncThunk("post/fetchPosts", async () => {
   const postsData = await response.json()
   const postsWithIds: IPost[] = postsData.map((post: IPost) => {
     return {
-      _id: post._id, // Assuming the fetched data has "_id" property for the ID
-      title: post.title,
-      imageUrl: post.imageUrl,
-      content: post.content,
+      ...post,
+      _id: post._id?.toString(),
     }
   })
 
@@ -102,7 +102,14 @@ const postSlice = createSlice({
       })
       .addCase(fetchSinglePost.fulfilled, (state, action) => {
         state.status = "idle"
-        state.posts = [action.payload]
+        const index = state.posts.findIndex(
+          (post) => post._id === action.payload._id
+        )
+        if (index !== -1) {
+          state.posts[index] = action.payload
+        } else {
+          state.posts.push(action.payload)
+        }
       })
       .addCase(fetchSinglePost.rejected, (state) => {
         state.status = "failed"

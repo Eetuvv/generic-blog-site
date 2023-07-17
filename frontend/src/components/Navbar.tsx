@@ -7,10 +7,7 @@ const Navbar = () => {
       <div className="container mx-auto max-w-screen-md">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <Link
-              to="/"
-              className="flex items-center px-1 py-0 hover:bg-gray-800"
-            >
+            <Link to="/" className="flex items-center p-3 hover:bg-gray-800">
               <FaBlog className="w-8 h-8 mr-2" />
               <h1 className="font-bold text-3xl">Blogster</h1>
             </Link>

@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import React, { useEffect } from "react"
+import ReactMarkdown from "react-markdown"
 import { useParams } from "react-router-dom"
 import { TwitterTweetEmbed } from "react-twitter-embed"
 import { useDispatch, useSelector } from "react-redux"
@@ -6,6 +7,7 @@ import { RootState, AppDispatch } from "../store"
 import { fetchSinglePost } from "../postSlice"
 import LoadingSpinner from "../components/LoadingSpinner"
 import { formatDate } from "../utils/dateutils"
+import CustomMarkdownComponents from "../styles/MarkdownStyles"
 
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>()
@@ -76,7 +78,7 @@ const BlogPost = () => {
             className="flex justify-center items-center w-full h-full"
             key={index}
           >
-            <div className="w-7/12 h-7/12">
+            <div className="w-7/12 h-7/12 my-6">
               <img
                 src={url}
                 alt={alt}
@@ -89,17 +91,15 @@ const BlogPost = () => {
       }
 
       return (
-        <p
-          className="text-lg leading-7 mb-8"
-          key={index}
-          dangerouslySetInnerHTML={{ __html: block }}
-        />
+        <ReactMarkdown components={CustomMarkdownComponents}>
+          {block}
+        </ReactMarkdown>
       )
     })
   }
 
   return (
-    <div className="bg-black text-white py-6 px-8">
+    <div className="bg-black py-6 px-8">
       <div className="max-w-3xl mx-auto space-y-4">
         {post.titleImageURL !== null && (
           <div className="">

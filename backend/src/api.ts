@@ -74,38 +74,35 @@ const authenticateToken = (
   })
 }
 
-app.post(
-  "http://localhost:5000/api/login",
-  async (req: Request, res: Response) => {
-    try {
-      const { username, password } = req.body
+app.post("/api/login", async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body
 
-      const user = await usersCollection.findOne({ username })
+    const user = await usersCollection.findOne({ username })
 
-      if (!user) {
-        return res.status(404).send({ message: "Invalid credentials" })
-      }
-
-      const passwordMatch = await bcrypt.compare(password, user.password)
-
-      if (!passwordMatch) {
-        return res.status(401).send({ message: "Invalid credentials" })
-      }
-
-      const token = jwt.sign(
-        { username: user.username },
-        process.env.JWT_SECRET as string,
-        { expiresIn: "1h" }
-      )
-
-      res.cookie("token", token, { httpOnly: true })
-      res.sendStatus(200)
-    } catch (err) {
-      console.error(err)
-      res.status(500).send({ message: "Internal server error" })
+    if (!user) {
+      return res.status(404).send({ message: "Invalid credentials" })
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.password)
+
+    if (!passwordMatch) {
+      return res.status(401).send({ message: "Invalid credentials" })
+    }
+
+    const token = jwt.sign(
+      { username: user.username },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    )
+
+    res.cookie("token", token, { httpOnly: true })
+    res.sendStatus(200)
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: "Internal server error" })
   }
-)
+})
 
 app.post(
   "/api/posts",

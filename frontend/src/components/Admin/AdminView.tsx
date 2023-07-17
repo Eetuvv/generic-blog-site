@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { RootState, AppDispatch } from "../../store"
-import { addPost, setPosts, IPost } from "../../postSlice"
+import { addPost, setPosts } from "../../postSlice"
 import AddPostButton from "./AddPostButton"
 import PostModal from "./PostModal"
 import LoadingSpinner from "../LoadingSpinner"
@@ -12,7 +12,7 @@ import Modal from "react-modal"
 Modal.setAppElement("#root")
 
 const AdminView = () => {
-  const { authenticated, token } = useAuth()
+  const { authenticated } = useAuth()
   const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>()
   const status = useSelector((state: RootState) => state.post.status)
@@ -40,16 +40,15 @@ const AdminView = () => {
       content,
       author,
     }
-    if (token) {
-      dispatch(addPost({ newPost, token }))
-        .then((action) => {
-          const insertedPost = action.payload as IPost
-          dispatch(setPosts([insertedPost]))
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    }
+
+    dispatch(addPost({ newPost }))
+      .unwrap() // This will return the raw action result, whether it was rejected or fulfilled
+      .then((insertedPost) => {
+        dispatch(setPosts([insertedPost]))
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     handleCloseModal()
   }
 

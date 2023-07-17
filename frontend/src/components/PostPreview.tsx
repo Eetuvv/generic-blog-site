@@ -1,4 +1,5 @@
 import React from "react"
+import ReactMarkdown from "react-markdown"
 import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { RootState } from "../store"
@@ -34,7 +35,7 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
   }
 
   return (
-    <div className="container mx-auto px-1 py-8">
+    <div className="container mx-auto p-r-1 py-8">
       <div className="max-w-3xl mx-auto">
         {posts.map((post, index) => {
           const storedPost = storedPosts.find((p) => p?._id === post?._id)
@@ -43,7 +44,7 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
             <Link
               to={`/posts/${storedPost._id}`}
               key={index}
-              className="hover:bg-gray-800 transition-colors p-4 rounded-md flex mb-3"
+              className="hover:bg-gray-800 transition-colors p-3 rounded-md flex mb-3"
             >
               <div className="flex-1">
                 <div className="flex flex-col items-center md:items-start text-center md:text-left">
@@ -62,8 +63,10 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
                     </span>
                   </div>
                 </div>
-                <p className="text-lg text-gray-300 leading-snug mr-2">
-                  {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
+                <p className="text-lg text-gray-300 leading-snug mr-3">
+                  <ReactMarkdown>
+                    {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
+                  </ReactMarkdown>
                 </p>
               </div>
               {storedPost.titleImageURL && (

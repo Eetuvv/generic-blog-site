@@ -1,10 +1,11 @@
-import React, { createContext, useState, ReactNode } from "react"
+import React, { createContext, useState, useEffect, ReactNode } from "react"
 
 interface AuthContextProps {
   authenticated: boolean
   token: string | null
   setAuthentication: (authenticated: boolean, token: string | null) => void
 }
+
 interface AuthProviderProps {
   children: ReactNode
 }
@@ -16,10 +17,25 @@ export const AuthContext = createContext<AuthContextProps>({
 })
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [authenticated, setAuthenticated] = useState(false)
-  const [token, setToken] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  )
+  const [authenticated, setAuthenticated] = useState<boolean>(!!token)
+
+  useEffect(() => {
+    const localToken = localStorage.getItem("token")
+    if (localToken) {
+      setToken(localToken)
+      setAuthenticated(true)
+    }
+  }, [])
 
   const setAuthentication = (authenticated: boolean, token: string | null) => {
+    if (authenticated && token) {
+      localStorage.setItem("token", token)
+    } else {
+      localStorage.removeItem("token")
+    }
     setAuthenticated(authenticated)
     setToken(token)
   }

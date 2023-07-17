@@ -1,7 +1,8 @@
-import React, { useState, useContext } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { AuthContext } from "./AuthContext"
+import { useDispatch } from "react-redux"
+import { setToken } from "../../postSlice"
 
 const LoginForm = () => {
   const [username, setUsername] = useState("")
@@ -10,10 +11,16 @@ const LoginForm = () => {
   const [successMsg, setSuccessMsg] = useState("")
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  const { setAuthentication } = useContext(AuthContext)
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      navigate("/admin")
+    }
+  }, [navigate])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault()
 
     try {
@@ -23,14 +30,13 @@ const LoginForm = () => {
       })
 
       const token = response.data.token
-      localStorage.setItem("token", token)
 
       setSuccessMsg("Login successful!")
       setErrorMsg("")
-      setTimeout(() => {
-        setAuthentication(true, token)
-        navigate("/admin")
-      }, 2000)
+      dispatch(setToken(token))
+      localStorage.setItem("token", token) // Store the token in local storage
+
+      navigate("/admin") // Redirect to the admin page
     } catch (err: any) {
       setErrorMsg(
         err.response ? err.response.data.message : "An error occurred"

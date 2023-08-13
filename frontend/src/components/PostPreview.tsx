@@ -44,7 +44,7 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
           return (
             <Link
               to={`/posts/${storedPost._id}`}
-              key={key}
+              key={storedPost._id}
               className="hover:bg-gray-800 transition-colors p-3 rounded-md flex mb-3"
             >
               <div className="flex-1">

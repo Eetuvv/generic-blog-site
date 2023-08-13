@@ -1,6 +1,7 @@
 import Modal from "react-modal"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
+import IPost from "../../postSlice"
 
 interface PostModalProps {
   isOpen: boolean
@@ -12,6 +13,9 @@ interface PostModalProps {
   titleImageURL: string
   settitleImageURL: (value: string) => void
   handleAddPost: () => void
+  handleEditPost?: (postId: string) => void
+  editingPostId?: string
+  isEditing?: boolean
   author: string
   setAuthor: (value: string) => void
 }
@@ -26,6 +30,9 @@ const PostModal: React.FC<PostModalProps> = ({
   titleImageURL,
   settitleImageURL,
   handleAddPost,
+  handleEditPost,
+  editingPostId,
+  isEditing,
   author,
   setAuthor,
 }) => {
@@ -61,7 +68,9 @@ const PostModal: React.FC<PostModalProps> = ({
             Close
           </button>
         </div>
-        <h2 className="text-2xl font-semibold mb-4">Add Post</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          {isEditing ? "Edit Post" : "Add Post"}
+        </h2>
         <input
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
@@ -97,10 +106,18 @@ const PostModal: React.FC<PostModalProps> = ({
         />
 
         <button
-          onClick={handleAddPost}
+          onClick={() => {
+            if (isEditing && editingPostId) {
+              if (handleEditPost) {
+                handleEditPost(editingPostId)
+              }
+            } else {
+              handleAddPost()
+            }
+          }}
           className="bg-white text-black hover:bg-gray-200 font-semibold py-2 px-4 rounded mt-4"
         >
-          Add Post
+          {isEditing ? "Update Post" : "Add Post"}
         </button>
       </div>
     </Modal>

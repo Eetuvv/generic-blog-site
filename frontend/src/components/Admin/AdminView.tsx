@@ -79,23 +79,6 @@ const AdminView = () => {
     handleCloseModal()
   }
 
-  const handleDeletePost = (postId: string) => {
-    const confirmDeletion = window.confirm(
-      "Are you sure you want to delete this post?"
-    )
-    if (!confirmDeletion) return
-
-    dispatch(deletePost(postId))
-      .unwrap()
-      .then(() => {
-        console.log("Post deleted successfully")
-        dispatch(fetchPosts())
-      })
-      .catch((error) => {
-        console.error("Failed to delete post", error)
-      })
-  }
-
   const handleEditPost = (postId: string) => {
     const updatedPost = {
       title,
@@ -112,6 +95,23 @@ const AdminView = () => {
       })
       .catch((error) => {
         console.error("Failed to edit post", error)
+      })
+  }
+
+  const handleDeletePost = (postId: string) => {
+    const confirmDeletion = window.confirm(
+      "Are you sure you want to delete this post?"
+    )
+    if (!confirmDeletion) return
+
+    dispatch(deletePost(postId))
+      .unwrap()
+      .then(() => {
+        console.log("Post deleted successfully")
+        dispatch(fetchPosts())
+      })
+      .catch((error) => {
+        console.error("Failed to delete post", error)
       })
   }
 
@@ -235,5 +235,4 @@ const AdminView = () => {
     </div>
   )
 }
-
 export default AdminView

@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import { useParams } from "react-router-dom"
 import { TwitterTweetEmbed } from "react-twitter-embed"
+import parse from "html-react-parser"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState, AppDispatch } from "../store"
 import { fetchSinglePost } from "../postSlice"
@@ -41,7 +42,7 @@ const BlogPost = () => {
   }
 
   const parseContent = (content: string) => {
-    const regex = /{(tweet:[\d]+|image:[^|]+?\|[^}]+?)}/g
+    const regex = /{(tweet:[\d][^}]+?)}/g
     let matches
     const blocks = []
     let lastIndex = 0
@@ -72,31 +73,9 @@ const BlogPost = () => {
             </div>
           </div>
         )
-      } else if (block.startsWith("image:")) {
-        const [url, alt] = block.slice(6).split("|")
-        const key = `${index}+${block}`
-        return (
-          <div
-            className="flex justify-center items-center w-full h-full"
-            key={key}
-          >
-            <div className="w-7/12 h-7/12 my-6">
-              <img
-                src={url}
-                alt={alt}
-                onError={handleImageError}
-                className="block mx-auto max-w-full h-auto"
-              />
-            </div>
-          </div>
-        )
       }
 
-      return (
-        <ReactMarkdown key={index} components={CustomMarkdownComponents}>
-          {block}
-        </ReactMarkdown>
-      )
+      return parse(block)
     })
   }
 

@@ -1,7 +1,7 @@
+import React from "react"
 import Modal from "react-modal"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
-import IPost from "../../postSlice"
 
 interface PostModalProps {
   isOpen: boolean
@@ -36,18 +36,30 @@ const PostModal: React.FC<PostModalProps> = ({
   author,
   setAuthor,
 }) => {
+  const quillRef = React.useRef<ReactQuill | null>(null)
   const insertImage = () => {
     const url = prompt("Enter the image URL:")
     if (url) {
-      const alt = prompt("Enter the alt text:")
-      setContent(content + `{image:${url}|${alt}}`)
+      if (quillRef && quillRef.current) {
+        const editor = quillRef.current.getEditor()
+        const range = editor.getSelection()
+        if (range) {
+          editor.insertEmbed(range.index, "image", url)
+        }
+      }
     }
   }
-
   const insertTweet = () => {
     const tweetId = prompt("Enter the tweet ID:")
     if (tweetId) {
-      setContent(content + `{tweet:${tweetId}}`)
+      const tweet = `{tweet:${tweetId}}`
+      if (quillRef && quillRef.current) {
+        const editor = quillRef.current.getEditor()
+        const range = editor.getSelection()
+        if (range) {
+          editor.insertEmbed(range.index, "text", tweet)
+        }
+      }
     }
   }
 
@@ -96,7 +108,12 @@ const PostModal: React.FC<PostModalProps> = ({
         >
           Insert Tweet
         </button>
-        <ReactQuill value={content} onChange={setContent} className="h-96" />
+        <ReactQuill
+          value={content}
+          onChange={setContent}
+          className="h-96"
+          ref={quillRef} // attach the ref to ReactQuill component
+        />
 
         <input
           value={titleImageURL}

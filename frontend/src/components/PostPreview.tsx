@@ -1,7 +1,7 @@
 import React from "react"
-import ReactMarkdown from "react-markdown"
 import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
+import parse from "html-react-parser"
 import { RootState } from "../store"
 import { IPost } from "../postSlice"
 import { formatDate } from "../utils/dateutils"
@@ -14,11 +14,11 @@ const MAX_TEXT_LENGTH = 200
 
 // Cut string at the last full word within the limit and add "..."
 const getPreviewText = (text: string | undefined, maxLength: number) => {
-  let strippedText =
-    text?.replace(/<p>|<\/p>|{tweet:[\d]+}|{image:[^}]+}/g, "") ?? ""
+  // don't render tweets or images in preview
+  let strippedText = text?.replace(/{tweet:[\d]+}|<img[^}]+>/g, "") ?? ""
   if (strippedText.length <= maxLength) return strippedText
   let trimmedText = strippedText.slice(0, maxLength)
-  trimmedText = trimmedText.substr(
+  trimmedText = trimmedText.substring(
     0,
     Math.min(trimmedText.length, trimmedText.lastIndexOf(" "))
   )
@@ -65,9 +65,7 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
                   </div>
                 </div>
                 <p className="text-lg text-gray-300 leading-snug mr-3">
-                  <ReactMarkdown>
-                    {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
-                  </ReactMarkdown>
+                  {parse(getPreviewText(storedPost.content, MAX_TEXT_LENGTH))}
                 </p>
               </div>
               {storedPost.titleImageURL && (

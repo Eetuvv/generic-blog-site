@@ -17,7 +17,7 @@ module.exports = function override(config) {
     timers: false,
     zlib: false,
     path: false,
-    querystring: require.resolve("querystring-es3"), // Add this line
+    querystring: require.resolve("querystring-es3"),
   })
   config.resolve.fallback = fallback
 

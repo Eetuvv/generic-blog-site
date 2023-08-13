@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { useDispatch } from "react-redux"
-import { setToken } from "../../postSlice"
 
 const LoginForm = () => {
   const [username, setUsername] = useState("")
@@ -11,11 +9,10 @@ const LoginForm = () => {
   const [successMsg, setSuccessMsg] = useState("")
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token) {
+    const isAuthenticated = localStorage.getItem("authenticated")
+    if (isAuthenticated === "true") {
       navigate("/admin")
     }
   }, [navigate])
@@ -24,19 +21,25 @@ const LoginForm = () => {
     event.preventDefault()
 
     try {
-      const response = await axios.post("http://localhost:5000/api/login", {
-        username,
-        password,
-      })
+      const response = await axios.post(
+        "http://localhost:5000/api/login",
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      )
 
-      const token = response.data.token
-
-      setSuccessMsg("Login successful!")
-      setErrorMsg("")
-      dispatch(setToken(token))
-      localStorage.setItem("token", token) // Store the token in local storage
-
-      navigate("/admin") // Redirect to the admin page
+      if (response.status === 200) {
+        setSuccessMsg("Login successful!")
+        setErrorMsg("")
+        localStorage.setItem("authenticated", "true")
+        navigate("/admin")
+      } else {
+        setErrorMsg("Failed to login.")
+      }
     } catch (err: any) {
       setErrorMsg(
         err.response ? err.response.data.message : "An error occurred"

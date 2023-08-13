@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { RootState } from "./store"
 
 export interface IPost {
   _id?: string
@@ -13,13 +12,11 @@ export interface IPost {
 interface PostState {
   posts: IPost[]
   status: "idle" | "loading" | "failed"
-  token: string | null
 }
 
 const initialState: PostState = {
   posts: [],
   status: "idle",
-  token: null,
 }
 
 export const fetchPosts = createAsyncThunk("post/fetchPosts", async () => {
@@ -41,19 +38,13 @@ export const fetchPosts = createAsyncThunk("post/fetchPosts", async () => {
 
 export const addPost = createAsyncThunk(
   "post/addPost",
-  async ({ newPost }: { newPost: IPost }, { getState }) => {
-    const token = (getState() as RootState).post.token
-
-    if (!token) {
-      throw new Error("Not authenticated")
-    }
-
+  async ({ newPost }: { newPost: IPost }) => {
     const response = await fetch("http://localhost:5000/api/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
       body: JSON.stringify(newPost),
     })
 
@@ -83,9 +74,6 @@ const postSlice = createSlice({
   reducers: {
     setPosts: (state, action: PayloadAction<IPost[]>) => {
       state.posts = action.payload
-    },
-    setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -130,5 +118,5 @@ const postSlice = createSlice({
   },
 })
 
-export const { setPosts, setToken } = postSlice.actions
+export const { setPosts } = postSlice.actions
 export default postSlice.reducer

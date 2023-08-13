@@ -46,7 +46,7 @@ client
 const app = express()
 app.use(
   cors({
-    origin: "http://localhost:3000", // your react app url
+    origin: "http://localhost:3000",
     credentials: true,
   })
 )
@@ -61,7 +61,7 @@ const authenticateToken = (
   const token = req.cookies.token
 
   if (token == null) {
-    return res.sendStatus(401)
+    return res.status(401).send("Missing authentication token")
   }
 
   jwt.verify(token, process.env.JWT_SECRET as string, (err: any, user: any) => {
@@ -96,7 +96,7 @@ app.post("/api/login", async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     )
 
-    res.cookie("token", token, { httpOnly: true })
+    res.cookie("token", token, { httpOnly: true, sameSite: "lax" })
     res.sendStatus(200)
   } catch (err) {
     console.error(err)

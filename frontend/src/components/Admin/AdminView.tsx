@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react"
-import ReactMarkdown from "react-markdown"
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import Modal from "react-modal"
+import parse from "html-react-parser"
 
 import { RootState, AppDispatch } from "../../store"
 import {
@@ -193,9 +193,7 @@ const AdminView = () => {
                     </div>
                   </div>
                   <p className="text-lg text-gray-300 leading-snug mr-3">
-                    <ReactMarkdown>
-                      {getPreviewText(storedPost.content, MAX_TEXT_LENGTH)}
-                    </ReactMarkdown>
+                    {parse(getPreviewText(storedPost.content, MAX_TEXT_LENGTH))}
                   </p>
                 </div>
                 {storedPost.titleImageURL && (

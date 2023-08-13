@@ -1,14 +1,14 @@
 import React, { useEffect } from "react"
-import ReactMarkdown from "react-markdown"
+
 import { useParams } from "react-router-dom"
 import { TwitterTweetEmbed } from "react-twitter-embed"
 import parse from "html-react-parser"
 import { useDispatch, useSelector } from "react-redux"
+
 import { RootState, AppDispatch } from "../store"
 import { fetchSinglePost } from "../postSlice"
 import LoadingSpinner from "../components/LoadingSpinner"
 import { formatDate } from "../utils/dateutils"
-import CustomMarkdownComponents from "../styles/MarkdownStyles"
 
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>()

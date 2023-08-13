@@ -1,8 +1,6 @@
-import React, { useState, useCallback } from "react"
 import Modal from "react-modal"
 import ReactQuill from "react-quill"
 import "react-quill/dist/quill.snow.css"
-import { useDropzone } from "react-dropzone"
 
 interface PostModalProps {
   isOpen: boolean
@@ -31,14 +29,6 @@ const PostModal: React.FC<PostModalProps> = ({
   author,
   setAuthor,
 }) => {
-  const [files, setFiles] = useState<File[]>([])
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles(acceptedFiles)
-    console.log(acceptedFiles)
-  }, [])
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-
   const insertImage = () => {
     const url = prompt("Enter the image URL:")
     if (url) {
@@ -63,6 +53,14 @@ const PostModal: React.FC<PostModalProps> = ({
       overlayClassName="fixed inset-0 bg-black bg-opacity-75"
     >
       <div className="bg-black text-white p-8 rounded-lg border-white border-2 w-8/12">
+        <div className="flex justify-end">
+          <button
+            className="font-bold hover:bg-gray-500"
+            onClick={handleCloseModal}
+          >
+            Close
+          </button>
+        </div>
         <h2 className="text-2xl font-semibold mb-4">Add Post</h2>
         <input
           value={author}
@@ -89,26 +87,13 @@ const PostModal: React.FC<PostModalProps> = ({
         >
           Insert Tweet
         </button>
-        <ReactQuill
-          value={content}
-          onChange={setContent}
-          className="h-96 mb-4"
-        />
-
-        <div {...getRootProps()} className="mt-4">
-          <input {...getInputProps()} />
-          <p className="text-gray-300">
-            {isDragActive
-              ? "Drop the files here ..."
-              : "Drag 'n' drop some files here, or click to select files"}
-          </p>
-        </div>
+        <ReactQuill value={content} onChange={setContent} className="h-96" />
 
         <input
           value={titleImageURL}
           onChange={(e) => settitleImageURL(e.target.value)}
-          placeholder="Image URL"
-          className="bg-black text-white border-2 p-2 rounded mb-4 w-full"
+          placeholder="Title Image URL"
+          className="bg-black text-white mt-14 border-2 p-2 rounded w-full"
         />
 
         <button

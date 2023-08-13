@@ -61,8 +61,9 @@ const BlogPost = () => {
     return blocks.map((block: string, index: number) => {
       if (block.startsWith("tweet:")) {
         const tweetId = block.slice(6)
+        const key = `${block}+${index}`
         return (
-          <div className="w-full my-3 flex justify-center" key={index}>
+          <div className="w-full my-3 flex justify-center" key={key}>
             <div style={{ maxWidth: "550px", width: "100%" }}>
               <TwitterTweetEmbed
                 tweetId={tweetId}
@@ -73,10 +74,11 @@ const BlogPost = () => {
         )
       } else if (block.startsWith("image:")) {
         const [url, alt] = block.slice(6).split("|")
+        const key = `${index}+${block}`
         return (
           <div
             className="flex justify-center items-center w-full h-full"
-            key={index}
+            key={key}
           >
             <div className="w-7/12 h-7/12 my-6">
               <img
@@ -91,7 +93,7 @@ const BlogPost = () => {
       }
 
       return (
-        <ReactMarkdown components={CustomMarkdownComponents}>
+        <ReactMarkdown key={index} components={CustomMarkdownComponents}>
           {block}
         </ReactMarkdown>
       )

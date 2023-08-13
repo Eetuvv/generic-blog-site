@@ -40,10 +40,11 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
         {posts.map((post, index) => {
           const storedPost = storedPosts.find((p) => p?._id === post?._id)
           if (!storedPost) return null
+          const key = `${storedPost._id} + ${index}`
           return (
             <Link
               to={`/posts/${storedPost._id}`}
-              key={index}
+              key={key}
               className="hover:bg-gray-800 transition-colors p-3 rounded-md flex mb-3"
             >
               <div className="flex-1">

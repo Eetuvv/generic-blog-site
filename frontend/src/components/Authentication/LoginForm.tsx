@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
+import { useContext } from "react"
 import { useNavigate } from "react-router-dom"
+import { AuthContext } from "../Authentication/AuthContext"
 
 const LoginForm = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [errorMsg, setErrorMsg] = useState("")
   const [successMsg, setSuccessMsg] = useState("")
+
+  const { setAuthentication } = useContext(AuthContext)
 
   const navigate = useNavigate()
 
@@ -36,6 +40,7 @@ const LoginForm = () => {
         setSuccessMsg("Login successful!")
         setErrorMsg("")
         localStorage.setItem("authenticated", "true")
+        setAuthentication(true)
         navigate("/admin")
       } else {
         setErrorMsg("Failed to login.")

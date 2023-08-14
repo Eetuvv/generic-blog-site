@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch as useReduxDispatch } from "react-redux"
+import { AppDispatch } from "../../store"
 import { useNavigate } from "react-router-dom"
 import Modal from "react-modal"
 import parse from "html-react-parser"
 
-import { RootState, AppDispatch } from "../../store"
-import {
-  IPost,
-  addPost,
-  fetchPosts,
-  setPosts,
-  editPost,
-  deletePost,
-} from "../../postSlice"
+import { RootState } from "../../store"
+import { IPost, fetchPosts } from "../../postSlice"
+import { useAdminUtils } from "./adminUtils"
 
 import AddPostButton from "./AddPostButton"
 import PostModal from "./PostModal"
@@ -22,7 +17,8 @@ import { formatDate } from "../../utils/dateutils"
 Modal.setAppElement("#root")
 
 const AdminView = () => {
-  const dispatch = useDispatch<AppDispatch>()
+  const useDispatch = () => useReduxDispatch<AppDispatch>()
+  const dispatch = useDispatch()
   const posts = useSelector((state: RootState) => state.post.posts)
   const { authenticated } = useAuth()
   const navigate = useNavigate()
@@ -37,6 +33,8 @@ const AdminView = () => {
   const [content, setContent] = useState("")
   const [author, setAuthor] = useState("")
   const [editingPost, setEditingPost] = useState<IPost | null>(null)
+
+  const { handleAddPost, handleEditPost, handleDeletePost } = useAdminUtils()
 
   const handleOpenModal = () => setIsOpen(true)
 
@@ -56,63 +54,6 @@ const AdminView = () => {
     setAuthor(post.author)
     setEditingPost(post)
     setIsOpen(true)
-  }
-
-  const handleAddPost = () => {
-    const newPost = {
-      title,
-      titleImageURL,
-      content,
-      author,
-    }
-
-    dispatch(addPost({ newPost }))
-      .unwrap()
-      .then((insertedPost) => {
-        dispatch(setPosts([insertedPost]))
-        dispatch(fetchPosts())
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-
-    handleCloseModal()
-  }
-
-  const handleEditPost = (postId: string) => {
-    const updatedPost = {
-      title,
-      titleImageURL,
-      content,
-      author,
-    }
-    dispatch(editPost({ postId, updatedPost }))
-      .unwrap()
-      .then((responsePost) => {
-        console.log("Post edited successfully", responsePost)
-        dispatch(fetchPosts())
-        handleCloseModal()
-      })
-      .catch((error) => {
-        console.error("Failed to edit post", error)
-      })
-  }
-
-  const handleDeletePost = (postId: string) => {
-    const confirmDeletion = window.confirm(
-      "Are you sure you want to delete this post?"
-    )
-    if (!confirmDeletion) return
-
-    dispatch(deletePost(postId))
-      .unwrap()
-      .then(() => {
-        console.log("Post deleted successfully")
-        dispatch(fetchPosts())
-      })
-      .catch((error) => {
-        console.error("Failed to delete post", error)
-      })
   }
 
   useEffect(() => {
@@ -158,8 +99,29 @@ const AdminView = () => {
           settitleImageURL={settitleImageURL}
           author={author}
           setAuthor={setAuthor}
-          handleAddPost={handleAddPost}
-          handleEditPost={handleEditPost}
+          handleAddPost={() =>
+            handleAddPost(
+              {
+                title,
+                titleImageURL,
+                content,
+                author,
+              },
+              handleCloseModal
+            )
+          }
+          handleEditPost={(postId: string) =>
+            handleEditPost(
+              postId,
+              {
+                title,
+                titleImageURL,
+                content,
+                author,
+              },
+              handleCloseModal
+            )
+          }
           editingPostId={editingPost?._id}
           isEditing={!!editingPost}
         />
@@ -171,7 +133,7 @@ const AdminView = () => {
             if (!storedPost) return null
             const key = `${storedPost._id} + ${index}`
             return (
-              <p
+              <div
                 key={key}
                 className="transition-colors p-3 rounded-md flex mb-3"
               >
@@ -225,7 +187,7 @@ const AdminView = () => {
                     Delete
                   </button>
                 </div>
-              </p>
+              </div>
             )
           })}
         </div>
@@ -233,4 +195,5 @@ const AdminView = () => {
     </div>
   )
 }
+
 export default AdminView

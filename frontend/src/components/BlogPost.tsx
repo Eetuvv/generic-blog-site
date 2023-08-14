@@ -83,11 +83,11 @@ const BlogPost = () => {
     <div className="bg-black py-6 px-8">
       <div className="max-w-3xl mx-auto space-y-4">
         {post.titleImageURL !== null && (
-          <div className="">
+          <div>
             <img
               src={post.titleImageURL}
               alt={post.title}
-              className="max-w-full max-h-full mb-10"
+              className="flex justify-center max-w-full max-h-full mb-10"
               onError={handleImageError}
             />
           </div>

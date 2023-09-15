@@ -1,23 +1,35 @@
-import { useEffect } from "react"
-
-import { useSelector, useDispatch } from "react-redux"
-
-import { RootState, AppDispatch } from "../store"
+import { useEffect, useState } from "react"
+import axios from "axios"
 import PostPreview from "./PostPreview"
+import { IPost } from "../types/post"
 import LoadingSpinner from "./LoadingSpinner"
-import { fetchPosts } from "../postSlice"
 
 const BlogFeed = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const posts = useSelector((state: RootState) => state.post.posts)
-  const status = useSelector((state: RootState) => state.post.status)
+  const [posts, setPosts] = useState<IPost[] | null>(null)
+
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    dispatch(fetchPosts())
-  }, [dispatch])
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get(`http://localhost:5000/api/posts`)
+        setPosts(response.data)
+      } catch (error: any) {
+        console.log(error.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
-  if (status === "loading") {
+  if (loading) {
     return <LoadingSpinner />
+  }
+
+  if (!posts) {
+    return null
   }
 
   return (

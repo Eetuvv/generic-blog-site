@@ -1,31 +1,47 @@
 import React, { useState, useEffect } from "react"
-import { useSelector, useDispatch as useReduxDispatch } from "react-redux"
-import { AppDispatch } from "../../store"
 import { useNavigate } from "react-router-dom"
 import Modal from "react-modal"
 import parse from "html-react-parser"
+import axios from "axios"
 
-import { RootState } from "../../store"
-import { IPost, fetchPosts } from "../../postSlice"
+import { IPost } from "../../types/post"
 import { useAdminUtils } from "./adminUtils"
 
 import AddPostButton from "./AddPostButton"
 import PostModal from "./PostModal"
 import { useAuth } from "../Authentication/useAuth"
 import { formatDate } from "../../utils/dateutils"
+import LoadingSpinner from "../LoadingSpinner"
 
 Modal.setAppElement("#root")
 
 const AdminView = () => {
-  const useDispatch = () => useReduxDispatch<AppDispatch>()
-  const dispatch = useDispatch()
-  const posts = useSelector((state: RootState) => state.post.posts)
   const { authenticated } = useAuth()
   const navigate = useNavigate()
 
+  const [posts, setPosts] = useState<IPost[]>([])
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    dispatch(fetchPosts())
-  }, [dispatch])
+    if (!authenticated) {
+      navigate("/login")
+    }
+  }, [authenticated, navigate])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get(`http://localhost:5000/api/posts`)
+        setPosts(response.data)
+      } catch (error: any) {
+        console.log(error.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
   const [isOpen, setIsOpen] = useState(false)
   const [title, setTitle] = useState("")
@@ -33,8 +49,10 @@ const AdminView = () => {
   const [content, setContent] = useState("")
   const [author, setAuthor] = useState("")
   const [editingPost, setEditingPost] = useState<IPost | null>(null)
-
-  const { handleAddPost, handleEditPost, handleDeletePost } = useAdminUtils()
+  const { handleAddPost, handleEditPost, handleDeletePost } = useAdminUtils(
+    posts,
+    setPosts
+  )
 
   const handleOpenModal = () => setIsOpen(true)
 
@@ -56,12 +74,6 @@ const AdminView = () => {
     setIsOpen(true)
   }
 
-  useEffect(() => {
-    if (!authenticated) {
-      navigate("/login")
-    }
-  }, [authenticated, navigate])
-
   const MAX_TEXT_LENGTH = 200
 
   const getPreviewText = (text: string | undefined, maxLength: number) => {
@@ -76,7 +88,13 @@ const AdminView = () => {
     return `${trimmedText}...`
   }
 
-  const storedPosts = useSelector((state: RootState) => state.post.posts)
+  if (loading) {
+    return <LoadingSpinner />
+  }
+
+  if (!posts) {
+    return null
+  }
 
   const handleImageError = (
     event: React.SyntheticEvent<HTMLImageElement, Event>
@@ -129,9 +147,7 @@ const AdminView = () => {
       <div className="container mx-auto p-r-1 py-8">
         <div className="max-w-3xl mx-auto">
           {posts.map((post, index) => {
-            const storedPost = storedPosts.find((p) => p?._id === post?._id)
-            if (!storedPost) return null
-            const key = `${storedPost._id} + ${index}`
+            const key = `${post._id} + ${index}`
             return (
               <div
                 key={key}
@@ -139,33 +155,29 @@ const AdminView = () => {
               >
                 <div className="flex-1">
                   <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                    <h2 className="text-3xl font-bold mb-2">
-                      {storedPost.title}
-                    </h2>
+                    <h2 className="text-3xl font-bold mb-2">{post.title}</h2>
                     <div className="text-sm text-gray-400 flex items-center my-2">
-                      <span>{storedPost.author}</span>
+                      <span>{post.author}</span>
                       <span className="mx-2">|</span>
                       <span>
                         {formatDate(
-                          storedPost.timestamp
-                            ? new Date(storedPost.timestamp)
-                            : new Date()
+                          post.timestamp ? new Date(post.timestamp) : new Date()
                         )}
                       </span>
                     </div>
                   </div>
                   <p className="text-lg text-gray-300 leading-snug mr-3">
-                    {parse(getPreviewText(storedPost.content, MAX_TEXT_LENGTH))}
+                    {parse(getPreviewText(post.content, MAX_TEXT_LENGTH))}
                   </p>
                 </div>
-                {storedPost.titleImageURL && (
+                {post.titleImageURL && (
                   <div
                     className="ml-4 md:ml-0 mt-2"
                     style={{ width: "150px", height: "125px" }}
                   >
                     <img
-                      src={storedPost.titleImageURL}
-                      alt={storedPost.title}
+                      src={post.titleImageURL}
+                      alt={post.title}
                       className="w-full h-full rounded-md object-cover"
                       onError={handleImageError}
                     />
@@ -174,15 +186,13 @@ const AdminView = () => {
                 <div className="flex">
                   <button
                     className="hover:bg-gray-600 w-14 h-12 mx-4 py-2 text-bold text-lg text-red-300"
-                    onClick={() => handleEditModal(storedPost)}
+                    onClick={() => handleEditModal(post)}
                   >
                     Edit
                   </button>
                   <button
                     className="hover:bg-gray-600 w-14 h-12 mx-4 text-bold text-lg text-red-300"
-                    onClick={() =>
-                      storedPost._id && handleDeletePost(storedPost._id)
-                    }
+                    onClick={() => post._id && handleDeletePost(post._id)}
                   >
                     Delete
                   </button>

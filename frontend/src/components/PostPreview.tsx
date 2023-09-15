@@ -1,14 +1,8 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import { useSelector } from "react-redux"
 import parse from "html-react-parser"
-import { RootState } from "../store"
-import { IPost } from "../postSlice"
+import { PostContainerProps } from "../types/post"
 import { formatDate } from "../utils/dateutils"
-
-interface PostContainerProps {
-  posts: IPost[]
-}
 
 const MAX_TEXT_LENGTH = 200
 
@@ -26,8 +20,6 @@ const getPreviewText = (text: string | undefined, maxLength: number) => {
 }
 
 const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
-  const storedPosts = useSelector((state: RootState) => state.post.posts)
-
   const handleImageError = (
     event: React.SyntheticEvent<HTMLImageElement, Event>
   ) => {
@@ -37,45 +29,39 @@ const PostPreview: React.FC<PostContainerProps> = ({ posts }) => {
   return (
     <div className="container mx-auto p-r-1 py-8">
       <div className="max-w-3xl mx-auto">
-        {posts.map((post, index) => {
-          const storedPost = storedPosts.find((p) => p?._id === post?._id)
-          if (!storedPost) return null
-          const key = `${storedPost._id} + ${index}`
+        {posts?.map((post, index) => {
+          const key = `${post._id} + ${index}`
           return (
             <Link
-              to={`/posts/${storedPost._id}`}
+              to={`/posts/${post._id}`}
               key={key}
               className="hover:bg-gray-800 transition-colors p-3 rounded-md flex mb-3"
             >
               <div className="flex-1">
                 <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                  <h2 className="text-3xl font-bold mb-2">
-                    {storedPost.title}
-                  </h2>
+                  <h2 className="text-3xl font-bold mb-2">{post.title}</h2>
                   <div className="text-sm text-gray-400 flex items-center my-2">
-                    <span>{storedPost.author}</span>
+                    <span>{post.author}</span>
                     <span className="mx-2">|</span>
                     <span>
                       {formatDate(
-                        storedPost.timestamp
-                          ? new Date(storedPost.timestamp)
-                          : new Date()
+                        post.timestamp ? new Date(post.timestamp) : new Date()
                       )}
                     </span>
                   </div>
                 </div>
                 <p className="text-lg text-gray-300 leading-snug mr-3">
-                  {parse(getPreviewText(storedPost.content, MAX_TEXT_LENGTH))}
+                  {parse(getPreviewText(post.content, MAX_TEXT_LENGTH))}
                 </p>
               </div>
-              {storedPost.titleImageURL && (
+              {post.titleImageURL && (
                 <div
                   className="ml-4 md:ml-0 mt-2"
                   style={{ width: "150px", height: "125px" }}
                 >
                   <img
-                    src={storedPost.titleImageURL}
-                    alt={storedPost.title}
+                    src={post.titleImageURL}
+                    alt={post.title}
                     className="w-full h-full rounded-md object-cover"
                     onError={handleImageError}
                   />

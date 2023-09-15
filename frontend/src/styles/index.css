@@ -1,0 +1,28 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-Regular.woff2') format('woff2'),
+       url('../fonts/Inter-Bold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1, h2, h3, p, a, ul, ol, li {
+  font-family: 'Inter', sans-serif;
+  color: #e0e0e0;
+}
+
+h1 {
+  font-size: 28px;
+}
+
+h2 { 
+  font-size: 22px;
+}
+
+h3 {
+  font-size: 18px;
+}

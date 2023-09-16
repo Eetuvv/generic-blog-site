@@ -204,6 +204,14 @@ app.delete(
   }
 )
 
+app.get(
+  "/api/check-auth",
+  authenticateToken,
+  (req: AuthenticatedRequest, res: Response) => {
+    res.status(200).send({ authenticated: true })
+  }
+)
+
 app.post("/api/logout", (req: Request, res: Response) => {
   res.clearCookie("token")
   res.sendStatus(200)

@@ -15,11 +15,25 @@ const LoginForm = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem("authenticated")
-    if (isAuthenticated === "true") {
-      navigate("/admin")
+    const checkAuthentication = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/check-auth",
+          {
+            withCredentials: true,
+          }
+        )
+
+        if (response.status === 200 && response.data.authenticated) {
+          setAuthentication(true)
+          navigate("/admin")
+        }
+      } catch (error) {
+        console.log(error)
+      }
     }
-  }, [navigate])
+    checkAuthentication()
+  }, [])
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
@@ -39,7 +53,6 @@ const LoginForm = () => {
       if (response.status === 200) {
         setSuccessMsg("Login successful!")
         setErrorMsg("")
-        localStorage.setItem("authenticated", "true")
         setAuthentication(true)
         navigate("/admin")
       } else {

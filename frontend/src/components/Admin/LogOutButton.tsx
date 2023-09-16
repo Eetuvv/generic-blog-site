@@ -22,7 +22,6 @@ const LogOutButton = () => {
 
       if (response.status === 200) {
         setAuthentication(false)
-        localStorage.removeItem("authenticated")
         navigate("/")
         console.log("Logged out successfully")
       } else {

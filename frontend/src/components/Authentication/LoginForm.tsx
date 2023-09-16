@@ -14,15 +14,14 @@ const LoginForm = () => {
 
   const navigate = useNavigate()
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/check-auth",
-          {
-            withCredentials: true,
-          }
-        )
+        const response = await axios.get(`${API_BASE_URL}/check-auth`, {
+          withCredentials: true,
+        })
 
         if (response.status === 200 && response.data.authenticated) {
           setAuthentication(true)
@@ -40,7 +39,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        `${API_BASE_URL}/login`,
         {
           username,
           password,

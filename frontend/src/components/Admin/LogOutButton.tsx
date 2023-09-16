@@ -10,7 +10,7 @@ const LogOutButton = () => {
   const handleLogout = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/logout",
+        `${process.env.REACT_APP_API_BASE_URL}/logout`,
         {},
         {
           headers: {

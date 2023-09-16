@@ -2,20 +2,22 @@ import axios from "axios"
 import { Dispatch, SetStateAction } from "react"
 import { IPost } from "../../types/post"
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
+
 export const useAdminUtils = (
   posts: IPost[],
   setPosts: Dispatch<SetStateAction<IPost[]>>
 ) => {
   const handleAddPost = async (newPost: IPost, afterAdd: () => void) => {
     try {
-      await axios.post("http://localhost:5000/api/posts", newPost, {
+      await axios.post(`${API_BASE_URL}/posts`, newPost, {
         headers: {
           "Content-Type": "application/json",
         },
         withCredentials: true,
       })
 
-      const response = await axios.get(`http://localhost:5000/api/posts`)
+      const response = await axios.get(`${API_BASE_URL}/posts`)
       const updatedPosts = response.data
       setPosts(updatedPosts)
       afterAdd()
@@ -31,7 +33,7 @@ export const useAdminUtils = (
   ) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/posts/${postId}`,
+        `${API_BASE_URL}/posts/${postId}`,
         updatedPost,
         {
           headers: {
@@ -59,7 +61,7 @@ export const useAdminUtils = (
     if (!confirmDeletion) return
 
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+      await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
         withCredentials: true,
       })
 

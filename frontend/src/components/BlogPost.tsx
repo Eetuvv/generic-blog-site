@@ -19,7 +19,7 @@ const BlogPost = () => {
       try {
         setLoading(true)
         const response = await axios.get(
-          `http://localhost:5000/api/posts/${postId}`
+          `${process.env.REACT_APP_API_BASE_URL}/posts/${postId}`
         )
         setPost(response.data[0])
       } catch (error: any) {

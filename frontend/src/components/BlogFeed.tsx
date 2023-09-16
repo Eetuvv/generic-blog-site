@@ -13,7 +13,9 @@ const BlogFeed = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`http://localhost:5000/api/posts`)
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/posts`
+        )
         setPosts(response.data)
       } catch (error: any) {
         console.log(error.message)

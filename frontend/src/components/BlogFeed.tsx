@@ -31,7 +31,11 @@ const BlogFeed = () => {
   }
 
   if (!posts) {
-    return null
+    return (
+      <div className="bg-black text-white text-4xl mt-12 flex justify-center">
+        No posts yet!
+      </div>
+    )
   }
 
   return (

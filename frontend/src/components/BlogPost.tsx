@@ -36,7 +36,11 @@ const BlogPost = () => {
   }
 
   if (!post) {
-    return null
+    return (
+      <div className="bg-black text-white text-4xl mt-12 flex justify-center">
+        Could not find post!
+      </div>
+    )
   }
 
   const date = post?.timestamp ? new Date(post.timestamp) : null

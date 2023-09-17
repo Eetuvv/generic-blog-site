@@ -45,9 +45,7 @@ export const useAdminUtils = (
       const updatedPosts = posts.map((post) =>
         post._id === postId ? response.data : post
       )
-      if (posts) {
-        setPosts(updatedPosts)
-      }
+      setPosts(updatedPosts)
       afterEdit()
     } catch (error) {
       console.error("Failed to edit post", error)
@@ -64,11 +62,8 @@ export const useAdminUtils = (
       await axios.delete(`${API_BASE_URL}/posts/${postId}`, {
         withCredentials: true,
       })
-
-      if (posts) {
-        const updatedPosts = posts.filter((post) => post._id !== postId)
-        setPosts(updatedPosts)
-      }
+      const updatedPosts = posts.filter((post) => post._id !== postId)
+      setPosts(updatedPosts)
     } catch (error) {
       console.error("Failed to delete post", error)
     }

@@ -10,7 +10,6 @@ import { formatDate } from "../utils/dateutils"
 
 const BlogPost = () => {
   const { postId } = useParams<{ postId: string }>()
-
   const [post, setPost] = useState<IPost | null>(null)
   const [loading, setLoading] = useState(true)
 

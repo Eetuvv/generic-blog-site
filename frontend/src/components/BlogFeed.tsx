@@ -6,7 +6,6 @@ import LoadingSpinner from "./LoadingSpinner"
 
 const BlogFeed = () => {
   const [posts, setPosts] = useState<IPost[] | null>(null)
-
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

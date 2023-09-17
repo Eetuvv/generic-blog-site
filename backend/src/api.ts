@@ -77,15 +77,12 @@ const authenticateToken = (
 app.post("/api/login", async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body
-
     const user = await usersCollection.findOne({ username })
-
     if (!user) {
       return res.status(404).send({ message: "Invalid credentials" })
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password)
-
     if (!passwordMatch) {
       return res.status(401).send({ message: "Invalid credentials" })
     }
@@ -129,9 +126,7 @@ app.post(
 app.get("/api/posts/:postId?", async (req: Request, res: Response) => {
   try {
     const postId = req.params.postId
-
     let posts
-
     if (postId) {
       const post = await postsCollection.findOne({ _id: new ObjectId(postId) })
       posts = post ? [post] : []
@@ -152,7 +147,6 @@ app.put(
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const postId = req.params.postId
-
       const updatedPost: Partial<IPost> = {
         title: req.body.title,
         content: req.body.content,
@@ -185,7 +179,6 @@ app.delete(
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const postId = req.params.postId
-
       const result = await postsCollection.deleteOne({
         _id: new ObjectId(postId),
       })

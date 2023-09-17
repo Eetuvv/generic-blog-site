@@ -21,14 +21,14 @@ let db: Db
 export let postsCollection: Collection<IPost>
 export let usersCollection: Collection<IUser>
 
-client
-  .connect()
-  .then(() => {
+export const initializeDatabase = async () => {
+  try {
+    await client.connect()
     console.log("Connected successfully to server")
     db = client.db("blog")
     postsCollection = db.collection("posts")
     usersCollection = db.collection("users")
-  })
-  .catch((err: any) => {
+  } catch (err) {
     console.error(err)
-  })
+  }
+}

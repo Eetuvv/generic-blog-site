@@ -4,27 +4,38 @@ import cors from "cors"
 import dotenv from "dotenv"
 import authRoutes from "./routes/authRoutes"
 import postRoutes from "./routes/postRoutes"
+import { initializeDatabase } from "./database/db"
 
 dotenv.config()
 
 const app = express()
-const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000"
 
-app.use(
-  cors({
-    origin: corsOrigin,
-  })
-)
-app.use(bodyParser.json())
+const setupServer = async () => {
+  try {
+    await initializeDatabase()
 
-app.use(authRoutes)
-app.use(postRoutes)
+    const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000"
+    app.use(
+      cors({
+        origin: corsOrigin,
+      })
+    )
+    app.use(bodyParser.json())
 
-app.get("/", (req, res) => {
-  res.send("API is running 🥳")
-})
+    app.use(authRoutes)
+    app.use(postRoutes)
 
-const PORT = process.env.PORT || 5000
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))
+    app.get("/", (req, res) => {
+      res.send("API is running 🥳")
+    })
+
+    const PORT = process.env.PORT || 8080
+    app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))
+  } catch (err) {
+    console.error("Failed to start the server:", err)
+  }
+}
+
+setupServer().catch((err) => console.error(err))
 
 export default app

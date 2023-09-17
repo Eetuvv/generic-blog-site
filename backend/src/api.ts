@@ -43,10 +43,11 @@ client
     console.error(err)
   })
 
+const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000"
 const app = express()
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: corsOrigin,
     credentials: true,
   })
 )
@@ -74,6 +75,10 @@ const authenticateToken = (
   })
 }
 
+app.get("/", (req, res) => {
+  res.send("API is running 🥳")
+})
+
 app.post("/api/login", async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body
@@ -93,7 +98,13 @@ app.post("/api/login", async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     )
 
-    res.cookie("token", token, { httpOnly: true, sameSite: "lax" })
+    const isProduction = process.env.NODE_ENV === "production"
+    const cookieOptions: Record<string, any> = {
+      secure: isProduction,
+      httpOnly: true,
+      sameSite: "Lax",
+    }
+    res.cookie("token", token, cookieOptions)
     res.sendStatus(200)
   } catch (err) {
     console.error(err)
@@ -216,3 +227,5 @@ app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))
 interface AuthenticatedRequest extends Request {
   user?: any
 }
+
+module.exports = app

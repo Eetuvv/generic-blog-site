@@ -20,7 +20,7 @@ const BlogPost = () => {
         const response = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}/posts/${postId}`
         )
-        setPost(response.data[0])
+        setPost(response.data)
       } catch (error: any) {
         console.log(error.message)
       } finally {

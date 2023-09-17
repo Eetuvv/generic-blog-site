@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/api.js",
+  "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node dist/api.js",
+    "start": "tsc && node dist/server.js",
     "build": "tsc"
   },
   "keywords": [],

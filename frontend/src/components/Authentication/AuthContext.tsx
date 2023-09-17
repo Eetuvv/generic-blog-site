@@ -15,7 +15,9 @@ export const AuthContext = createContext<AuthContextProps>({
 })
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [authenticated, setAuthenticated] = useState<boolean>(false)
+  const [authenticated, setAuthenticated] = useState<boolean>(
+    !!localStorage.getItem("token")
+  )
 
   const setAuthentication = (authenticated: boolean) => {
     setAuthenticated(authenticated)

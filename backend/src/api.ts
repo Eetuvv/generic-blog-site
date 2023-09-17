@@ -6,7 +6,6 @@ import bodyParser from "body-parser"
 import cors from "cors"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import cookieParser from "cookie-parser"
 
 dotenvConfig()
 
@@ -48,18 +47,17 @@ const app = express()
 app.use(
   cors({
     origin: corsOrigin,
-    credentials: true,
   })
 )
 app.use(bodyParser.json())
-app.use(cookieParser())
 
 const authenticateToken = (
   req: AuthenticatedRequest,
   res: Response,
   next: () => void
 ) => {
-  const token = req.cookies.token
+  const authHeader = req.headers["authorization"]
+  const token = authHeader && authHeader.split(" ")[1]
 
   if (token == null) {
     return res.status(401).send("Missing authentication token")
@@ -69,7 +67,6 @@ const authenticateToken = (
     if (err) {
       return res.sendStatus(403)
     }
-
     req.user = user
     next()
   })
@@ -77,39 +74,6 @@ const authenticateToken = (
 
 app.get("/", (req, res) => {
   res.send("API is running 🥳")
-})
-
-app.post("/api/login", async (req: Request, res: Response) => {
-  try {
-    const { username, password } = req.body
-    const user = await usersCollection.findOne({ username })
-    if (!user) {
-      return res.status(404).send({ message: "Invalid credentials" })
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password)
-    if (!passwordMatch) {
-      return res.status(401).send({ message: "Invalid credentials" })
-    }
-
-    const token = jwt.sign(
-      { username: user.username },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    )
-
-    const isProduction = process.env.NODE_ENV === "production"
-    const cookieOptions: Record<string, any> = {
-      secure: isProduction,
-      httpOnly: true,
-      sameSite: "Lax",
-    }
-    res.cookie("token", token, cookieOptions)
-    res.sendStatus(200)
-  } catch (err) {
-    console.error(err)
-    res.status(500).send({ message: "Internal server error" })
-  }
 })
 
 app.post(
@@ -216,9 +180,30 @@ app.get(
   }
 )
 
-app.post("/api/logout", (req: Request, res: Response) => {
-  res.clearCookie("token")
-  res.sendStatus(200)
+app.post("/api/login", async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body
+    const user = await usersCollection.findOne({ username })
+    if (!user) {
+      return res.status(404).send({ message: "Invalid credentials" })
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password)
+    if (!passwordMatch) {
+      return res.status(401).send({ message: "Invalid credentials" })
+    }
+
+    const token = jwt.sign(
+      { username: user.username },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    )
+
+    res.status(200).send({ token })
+  } catch (err) {
+    console.error(err)
+    res.status(500).send({ message: "Internal server error" })
+  }
 })
 
 const PORT = process.env.PORT || 5000

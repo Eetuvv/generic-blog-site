@@ -17,39 +17,29 @@ const LoginForm = () => {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 
   useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/check-auth`, {
-          withCredentials: true,
-        })
-
-        if (response.status === 200 && response.data.authenticated) {
-          setAuthentication(true)
-          navigate("/admin")
-        }
-      } catch (error) {
-        console.log(error)
+    const checkAuthentication = () => {
+      const token = localStorage.getItem("token")
+      if (token) {
+        // set authenticated to true in your context
+        setAuthentication(true)
+      } else {
+        navigate("/login")
       }
     }
     checkAuthentication()
-  }, [])
+  }, [setAuthentication, navigate])
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/login`,
-        {
-          username,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      )
+      const response = await axios.post(`${API_BASE_URL}/login`, {
+        username,
+        password,
+      })
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.token) {
+        localStorage.setItem("token", response.data.token)
         setSuccessMsg("Login successful!")
         setErrorMsg("")
         setAuthentication(true)

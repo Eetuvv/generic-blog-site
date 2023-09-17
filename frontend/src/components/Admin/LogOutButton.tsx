@@ -1,32 +1,17 @@
 import { useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { AuthContext } from "../Authentication/AuthContext"
-import axios from "axios"
 
 const LogOutButton = () => {
   const { setAuthentication } = useContext(AuthContext)
   const navigate = useNavigate()
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/logout`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-
-      if (response.status === 200) {
-        setAuthentication(false)
-        navigate("/")
-        console.log("Logged out successfully")
-      } else {
-        console.error("Error logging out")
-      }
+      localStorage.removeItem("token")
+      setAuthentication(false)
+      navigate("/")
+      console.log("Logged out successfully")
     } catch (err) {
       console.error("An error occurred while logging out:", err)
     }
